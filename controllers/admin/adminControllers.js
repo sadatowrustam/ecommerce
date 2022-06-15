@@ -2,8 +2,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const AppError = require('../../utils/appError');
 const catchAsync = require('../../utils/catchAsync');
-const { Admin } = require('../../models');
-
+const { Admin, Products } = require('../../models');
+const { Op } = require("sequelize")
+const fs = require("fs")
 const signToken = (id) => {
 
     return jwt.sign({ id }, 'rustam', {
@@ -23,7 +24,6 @@ const createSendToken = (admin, statusCode, res) => {
 
 exports.login = catchAsync(async(req, res, next) => {
     const { username, password } = req.body;
-    console.log(req.body)
     if (!username || !password) {
         return next(new AppError('Please provide username and  password', 400));
     }
@@ -95,3 +95,49 @@ exports.updateMe = catchAsync(async(req, res, next) => {
 
     createSendToken(admin, 200, res);
 });
+exports.changeTime = catchAsync(async(req, res, next) => {
+    const { newExpirationDay } = req.body
+    console.log(req.body)
+    var expiration_days = fs.readFileSync('test.txt', 'utf8')
+    let today = new Date().getTime()
+    let new_expiration_time_ms = Number(newExpirationDay) * 86400 * 1000
+    if (newExpirationDay > Number(expiration_days)) {
+        let expiration_time = today - new_expiration_time_ms
+        var products = await Products.findAll({
+            where: {
+                is_new_expire: {
+                    [Op.gt]: expiration_time
+                },
+                isNew: false
+            },
+        })
+        for (const product of products) {
+            await product.update({ isNew: true })
+            console.log(`Product with id: ${product.product_id} is  new product now`)
+        }
+    } else {
+        let expiration_time = today - new_expiration_time_ms
+        var products = await Products.findAll({
+            where: {
+                is_new_expire: {
+                    [Op.lt]: expiration_time
+                },
+                isNew: true
+            },
+        })
+        for (const product of products) {
+
+
+            await product.update({
+                isNew: false
+            })
+            console.log(`Product with id: ${product.product_id} is not new product now`)
+        }
+    }
+    fs.writeFileSync("test.txt", newExpirationDay.toString())
+    return res.status(200).send({ msg: "Sucess" })
+})
+exports.getTime = catchAsync(async(req, res, next) => {
+    var expiration_days = fs.readFileSync('test.txt', 'utf8')
+    return res.status(200).send({ day: Number(expiration_days) })
+})

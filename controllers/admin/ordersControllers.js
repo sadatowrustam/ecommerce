@@ -9,7 +9,7 @@ const {
     Stock,
     Images
 } = require('../../models');
-
+const { adminWarning } = require("../../utils/email")
 exports.getAllOrders = catchAsync(async(req, res, next) => {
     const limit = req.query.limit || 20;
     let { keyword, status } = req.query;
@@ -178,9 +178,12 @@ exports.editProduct = catchAsync(async(req, res, next) => {
         if (stock.quantity < quantity || stock.quantity == quantity) {
             quantity = stock.quantity
             total_price = order_product.price * quantity
+            adminWarning({ text: `${product.name_tm} atly haryt gutardy` })
             await stock.update({ quantity: 0 })
             await product.update({ isActive: false })
         } else {
+            if (stock.quantity - quantity < 6) adminWarning({ text: `${product.name_tm} atly harydyn sany 5-den asak dusdi` })
+            adminWarning({ text: `${product.name_tm} atly haryt gutardy` })
             await stock.update({ quantity: stock.quantity - quantity })
             total_price = order_product.price * quantity
         }
@@ -188,11 +191,11 @@ exports.editProduct = catchAsync(async(req, res, next) => {
         total_price = order_product.price * quantity
         let clear_quantity = order_product.quantity - quantity
         await stock.update({ quantity: stock.quantity + clear_quantity })
-        await product.update({ isActive: false })
     }
     let order_total_price = order.total_price - order_product.total_price + total_price
+    let order_total_quantity = order.total_quantity - order_product.quantity + quantity
     await order_product.update({ quantity, total_price })
-    await order.update({ total_price: order_total_price })
+    await order.update({ total_price: order_total_price, total_quantity: order_total_quantity })
     return res.status(200).send({ order, order_product })
 })
 exports.deleteOrder = catchAsync(async(req, res, next) => {

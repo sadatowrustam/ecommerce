@@ -1,9 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const { login, protect, updateMe, sendMe } = require("../../controllers/admin/adminControllers")
+const { login, protect, updateMe, sendMe, changeTime, getTime } = require("../../controllers/admin/adminControllers")
 router.post("/login", login)
 router.post("/edit", protect, updateMe)
 router.get("/get-me", protect, sendMe)
+router.get("/time", protect, getTime)
+router.post("/time", protect, changeTime)
 router.use("/banners", protect, require("./routes/bannersRouter")) //test edildi
 router.use('/categories', protect, require('./routes/categoriesRouter')); //test etmeli
 router.use("/subcategories", protect, require("./routes/subcategoriesRouter")) //test etmeli
