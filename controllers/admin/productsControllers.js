@@ -26,7 +26,7 @@ const capitalize = function(string) {
 };
 exports.getAllActiveProducts = catchAsync(async(req, res) => {
     const limit = req.query.limit || 20;
-    let { keyword, categoryId, subcategoryId, brandId, isActive, offset } = req.query;
+    let { keyword, categoryId, subcategoryId, isActive, offset } = req.query;
     let where = {}
     if (isActive != "undefined") {
         where.isActive = isActive

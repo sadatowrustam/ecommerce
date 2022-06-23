@@ -183,7 +183,6 @@ exports.editProduct = catchAsync(async(req, res, next) => {
             await product.update({ isActive: false })
         } else {
             if (stock.quantity - quantity < 6) adminWarning({ text: `${product.name_tm} atly harydyn sany 5-den asak dusdi` })
-            adminWarning({ text: `${product.name_tm} atly haryt gutardy` })
             await stock.update({ quantity: stock.quantity - quantity })
             total_price = order_product.price * quantity
         }

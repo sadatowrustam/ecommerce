@@ -18,7 +18,6 @@ exports.sendEmail = async(options) => {
     await transporter.sendMail(mailOptions);
 };
 exports.adminWarning = async(options) => {
-    console.log("adminWarning")
     const transporter = nodemailer.createTransport({
         host: 'smtp.mail.ru',
         port: 465,

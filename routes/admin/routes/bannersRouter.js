@@ -16,7 +16,7 @@ const router = express.Router();
 router.get('/', protect, getAllBanners);
 router.get('/:id', protect, getBanner);
 router.post('/add', protect, addBanner);
-// router.patch("/:id", protect, editBanner)
+router.patch("/:id", protect, editBanner)
 router.delete('/:id', protect, deleteBanner);
 router.post('/upload-image-tm/:id', protect, uploadBannerImageTm);
 router.post("/upload-image-ru/:id", protect, uploadBannerImageRu)

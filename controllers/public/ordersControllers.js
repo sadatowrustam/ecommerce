@@ -1,7 +1,7 @@
 const AppError = require('../../utils/appError');
 const catchAsync = require('../../utils/catchAsync');
 const { Products, Orders, Orderproducts, Stock, Gifts, Userswithgift } = require('../../models');
-
+const { adminWarning } = require("../../utils/email")
 exports.addMyOrders = catchAsync(async(req, res, next) => {
     var {
         address,
@@ -19,7 +19,6 @@ exports.addMyOrders = catchAsync(async(req, res, next) => {
     let total_quantity = 0;
     if (order_products)
         for (var i = 0; i < order_products.length; i++) {
-
             const product = await Products.findOne({
                 where: { product_id: order_products[i].product_id }
             });
@@ -35,8 +34,10 @@ exports.addMyOrders = catchAsync(async(req, res, next) => {
                 order_products[i].quantity = stock.quantity
                 stock.quantity = 0
                 await stock.save()
+                adminWarning({ text: `${product.name_tm} atly haryt gutardy` })
                 await product.update({ isActive: false })
             } else {
+                if (stock.quantity - quantity < 6) adminWarning({ text: `${product.name_tm} atly harydyn sany 5-den asak dusdi` })
                 stock.quantity = stock.quantity - order_products[i].quantity
                 await stock.save()
             }

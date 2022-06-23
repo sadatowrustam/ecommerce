@@ -9,7 +9,15 @@ exports.addBanner = catchAsync(async(req, res, next) => {
     const newBanner = await Banners.create(req.body);
     return res.status(201).send(newBanner);
 });
+exports.editBanner = catchAsync(async(req, res, next) => {
+    const banner_id = req.params.id;
+    const banner = await Banners.findOne({ where: { banner_id } });
 
+    if (!banner)
+        return next(new AppError('Banner did not found with that ID', 404));
+    await banner.update(req.body)
+    return res.status(200).send(banner)
+})
 exports.uploadBannerImageTm = catchAsync(async(req, res, next) => {
     const banner_id = req.params.id;
     const banner = await Banners.findOne({ where: { banner_id } });
