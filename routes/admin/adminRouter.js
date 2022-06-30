@@ -16,4 +16,5 @@ router.use("/orders", require("./routes/ordersRouter"))
 router.use("/gifts", protect, require("./routes/giftsRouter"))
 router.use("/static", protect, require("./routes/staticRouter"))
 router.use("/currency", protect, require("./routes/currencyRouter"))
+router.use("/chats", protect, require("./routes/chatRouter"))
 module.exports = router
